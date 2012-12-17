@@ -39,11 +39,15 @@
     sms.prototype.receive = function(from, cb) {
         var io = this.io;
         io.sockets.on('connection', function (socket) {
-            socket.on('sms.emu.to.server', function (data) {
-                if(from == '*' || from == number) {
+            if(from == '*') {
+                socket.on('sms.emu.to.server', function (data) {
                     cb(data.number, data.msg);
-                }
-            });
+                });
+            } else {
+                socket.on('sms.emu.to.server.from.'+from, function (data) {
+                    cb(data.number, data.msg);
+                });
+            }
         });
     };
     

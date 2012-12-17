@@ -30,6 +30,10 @@ $(function() {
             number: $("#vnumber").html(),
             msg: $("#smsout").val()
         });
+        socket.emit('sms.emu.to.server.from.'+$("#vnumber").html(), {
+            number: $("#vnumber").html(),
+            msg: $("#smsout").val()
+        });
         
         $('#smsout').val('');
         $('#smsout').focus();
