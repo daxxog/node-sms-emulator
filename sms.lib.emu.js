@@ -22,20 +22,26 @@
 }(this, function() {
     var sms = {};
     
-    sms = function(io) {
+    sms = function(io, socket) {
         this.io = io;
+        this._recieve_handle = {};
         var _this = this;
-        this.socketstack = [];
         
-        io.sockets.on('connection', function(socket) {
-            _this.socketstack.forEach(function(v, i, a) {
-                v(socket);
+        if(typeof socket == 'object') {
+            socket.on('sms.emu.to.server', function(data) {
+                _this._receive(data);
             });
-        });
+        } else {
+            io.sockets.on('connection', function(socket) {
+                socket.on('sms.emu.to.server', function(data) {
+                    _this._receive(data);
+                });
+            });
+        }
     };
     
-    sms.init = function(io) {
-        return new sms(io);
+    sms.init = function(io, socket) {
+        return new sms(io, socket);
     };
     
     sms.prototype.send = function(to, message, cb) {
@@ -44,22 +50,24 @@
         setTimeout(cb, 1);
     };
     
-    sms.prototype.socketbind = function(cb) {
-        this.socketstack.push(cb);
-    }
+    sms.prototype._receive = function(data) {
+        if(typeof this._recieve_handle[data.number] == 'function') {
+            this._recieve_handle[data.number](data);
+        } else if(typeof this._recieve_handle['*'] == 'function') {
+            this._recieve_handle['*'](data);
+        }
+    };
     
     sms.prototype.receive = function(from, cb) {
-        this.socketbind(function(socket) {        
-            if(from == '*') {
-                socket.on('sms.emu.to.server', function (data) {
-                    cb(data.number, data.msg);
-                });
-            } else {
-                socket.on('sms.emu.to.server.from.'+from, function (data) {
-                    cb(data.number, data.msg);
-                });
+        if(typeof cb == 'string' && cb == 'unbind') {
+            if(typeof this._recieve_handle[from] != 'undefined') {
+                delete this._recieve_handle[from];
             }
-        });
+        } else {
+            this._recieve_handle[from] = function(data) {     
+                cb(data.number, data.msg);
+            };
+        }
     };
     
     return sms;

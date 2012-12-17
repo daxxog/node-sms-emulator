@@ -27,6 +27,13 @@
 
         sms.receive('*', function(from, msg) {
             sms.send(from, from+' said "'+msg+'"');
+            if(msg=="hello") {
+                sms.send(from, 'please say world');
+                sms.receive(from, function(from, msg) {
+                    sms.send(from, 'thank you :)');
+                    sms.receive(from, 'unbind');
+                });
+            }
         });
     };
     
