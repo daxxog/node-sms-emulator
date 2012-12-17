@@ -3,7 +3,7 @@
     "description" : "Emulate sending / receiving text messages with a generic API.",
     "homepage"    : "https://github.com/daxxog/node-sms-emulator",
     "main"        : "sms.lib.emu.js",
-    "version"     : "0.0.4",
+    "version"     : "0.0.5",
     "engines": { "node" : ">=0.8.15" },
     "maintainers": [{
         "name"  : "David Volm",

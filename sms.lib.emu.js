@@ -24,6 +24,14 @@
     
     sms = function(io) {
         this.io = io;
+        var _this = this;
+        this.socketstack = [];
+        
+        io.sockets.on('connection', function(socket) {
+            _this.socketstack.forEach(function(v, i, a) {
+                v(socket);
+            });
+        });
     };
     
     sms.init = function(io) {
@@ -36,9 +44,12 @@
         setTimeout(cb, 1);
     };
     
+    sms.prototype.socketbind = function(cb) {
+        this.socketstack.push(cb);
+    }
+    
     sms.prototype.receive = function(from, cb) {
-        var io = this.io;
-        io.sockets.on('connection', function (socket) {
+        this.socketbind(function(socket) {        
             if(from == '*') {
                 socket.on('sms.emu.to.server', function (data) {
                     cb(data.number, data.msg);
