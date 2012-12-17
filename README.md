@@ -31,3 +31,8 @@ dynamic.bind = function(app, express, io, data) {
     });
 };
 ```
+
+then just load up the client (looks good on iPhone too!)
+```
+http://YOUR_HOST:YOUR_PORT/sms-emu.html
+```
