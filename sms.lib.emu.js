@@ -24,7 +24,6 @@
     
     sms = function(io, socket) {
         this.io = io;
-        this._recieve_handle = {};
         var _this = this;
         
         if(typeof socket == 'object') {
@@ -51,23 +50,15 @@
     };
     
     sms.prototype._receive = function(data) {
-        if(typeof this._recieve_handle[data.number] == 'function') {
-            this._recieve_handle[data.number](data);
-        } else if(typeof this._recieve_handle['*'] == 'function') {
-            this._recieve_handle['*'](data);
+        if(typeof this._recieve_handle == 'function') {
+            this._recieve_handle(data);
         }
     };
     
-    sms.prototype.receive = function(from, cb) {
-        if(typeof cb == 'string' && cb == 'unbind') {
-            if(typeof this._recieve_handle[from] != 'undefined') {
-                delete this._recieve_handle[from];
-            }
-        } else {
-            this._recieve_handle[from] = function(data) {     
-                cb(data.number, data.msg);
-            };
-        }
+    sms.prototype.receive = function(cb) {
+        this._recieve_handle = function(data) {     
+            cb(data.number, data.msg);
+        };
     };
     
     return sms;

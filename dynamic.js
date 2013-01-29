@@ -24,15 +24,25 @@
     
     dynamic.bind = function(app, express, io, data) {
         var sms = require('./sms.lib.emu.js').init(io);
-
-        sms.receive('*', function(from, msg) {
-            sms.send(from, from+' said "'+msg+'"');
-            if(msg=="hello") {
-                sms.send(from, 'please say world');
-                sms.receive(from, function(from, msg) {
-                    sms.send(from, 'thank you :)');
-                    sms.receive(from, 'unbind');
-                });
+        
+        var _tryworld = false;
+        sms.receive(function(from, msg) {
+            if(_tryworld === false) {
+                sms.send(from, from+' said "'+msg+'"');
+                if(msg === 'hello') {
+                    sms.send(from, 'please say world');
+                    _tryworld = true;
+                } else {
+                    sms.send(from, 'please say hello');
+                }
+            } else if(_tryworld === true) {
+                if(msg === 'world') {
+                    sms.send(from, 'thank you '+from+' :)');
+                    _tryworld = false;
+                } else {
+                    sms.send(from, 'you monster!');
+                    _tryworld = false;
+                }
             }
         });
     };
