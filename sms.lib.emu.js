@@ -43,7 +43,14 @@
         return new sms(io, socket);
     };
     
-    sms.prototype.send = function(to, message, cb) {
+    sms.prototype.send = function(_to, message, cb) {
+        var to;
+        if(_to.length === 11) {
+            to = _to.substr(1, 10);
+        } else {
+            to = _to;
+        }
+        
         var socket = this.io.sockets;
         socket.emit('sms.emu.to.'+to, message);
         setTimeout(cb, 1);
