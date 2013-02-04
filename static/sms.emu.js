@@ -24,20 +24,43 @@ $(function() {
         });
     }; mod_number();
     
-    $('#send').click(function() {
-        $('<div></div>').html('<i>me: </i><pre>'+$('#smsout').val()+'</pre>').appendTo('#smsin');
-        socket.emit('sms.emu.to.server', {
-            number: $("#vnumber").html(),
-            msg: $("#smsout").val()
-        });
-        socket.emit('sms.emu.to.server.from.'+$("#vnumber").html(), {
-            number: $("#vnumber").html(),
-            msg: $("#smsout").val()
-        });
+    var _send = function() {
+        var _cmd = $.trim($("#smsout").val());
+        if(_cmd === ':clear' || _cmd === ':!'  || _cmd === ':1') {
+            $('#smsin').html('');
+        } else {
+            $('<div></div>').html('<i>me: </i><pre>'+$('#smsout').val()+'</pre>').appendTo('#smsin');
+            socket.emit('sms.emu.to.server', {
+                number: $("#vnumber").html(),
+                msg: $("#smsout").val()
+            });
+            socket.emit('sms.emu.to.server.from.'+$("#vnumber").html(), {
+                number: $("#vnumber").html(),
+                msg: $("#smsout").val()
+            });
+        }
         
         $('#smsout').val('');
         $('#smsout').focus();
-    });
+    };
+    
+    $('#send').click(_send);
+    
+    var _ekcheck = function(e) {
+        if(e.which === 13) {
+            _send();
+        }
+    };
+    
+    var _checker = function() {
+        $('#smsout').focus();
+        
+        if($("#senter").is(':checked')) {
+            $('#smsout').on('keydown', _ekcheck);
+        } else {
+            $('#smsout').off('keydown', _ekcheck);
+        }
+    }; _checker(); $("#senter").click(_checker);
     
     $('#clear').click(function() {
         $('#smsin').html('');
